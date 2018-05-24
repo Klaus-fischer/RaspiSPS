@@ -1,0 +1,39 @@
+@startuml
+actor client
+participant SyncThread
+database Data
+participant Hardware
+client -> SyncThread : Create
+SyncThread -> SyncThread : Initialize
+activate SyncThread
+SyncThread -> Hardware : Initialize
+SyncThread -> Hardware : Read IO
+activate SyncThread
+activate Hardware
+SyncThread <-- Hardware : Response
+deactivate Hardware
+SyncThread -> Data : Set IO
+deactivate SyncThread
+client <-- SyncThread : Wait 
+
+loop
+	SyncThread -> Hardware : Read IO
+	activate Hardware
+	SyncThread <-- Hardware : Response
+	deactivate Hardware
+	SyncThread -> Data: Set Input Data
+	SyncThread -> Data: Compare Output Data
+
+	alt Saved Data != Hardware Data
+		SyncThread -> Hardware : Set Output Data
+	else
+		note right of SyncThread
+			Nothing to do
+		end note
+	end
+end
+
+client -> SyncThread : GetInput
+
+deactivate SyncThread
+@enduml
