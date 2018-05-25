@@ -4,17 +4,19 @@ participant SyncThread
 database Data
 participant Hardware
 client -> SyncThread : Create
+activate SyncThread
 SyncThread -> SyncThread : Initialize
 activate SyncThread
 SyncThread -> Hardware : Initialize
+
+
 SyncThread -> Hardware : Read IO
-activate SyncThread
 activate Hardware
 SyncThread <-- Hardware : Response
 deactivate Hardware
-SyncThread -> Data : Set IO
-deactivate SyncThread
+SyncThread -> Data : Set Data
 client <-- SyncThread : Create completed 
+deactivate SyncThread
 
 loop
 	SyncThread -> Hardware : Read IO
@@ -31,9 +33,37 @@ loop
 			Nothing to do
 		end note
 	end
+    
+	client ->> SyncThread : GetInput
+	activate SyncThread
+	SyncThread -> Data : GetInput
+	activate Data
+	SyncThread <-- Data : Response
+	deactivate Data
+	client <<-- SyncThread: Response
+	deactivate SyncThread
+    
+	client ->> SyncThread : SetOutput
+	activate SyncThread
+	SyncThread -> Data : SetOutput
+
+	
+	client <<-- SyncThread
+	deactivate SyncThread
+
 end
 
-client -> SyncThread : GetInput
+client -> SyncThread : Terminate
+activate SyncThread
+SyncThread -> SyncThread : Terminate
+
+SyncThread -x Hardware : Free Ressources
+SyncThread -x Data : Free Ressources
 
 deactivate SyncThread
+client <-- SyncThread
+deactivate SyncThread
+deactivate SyncThread
+
+client -x SyncThread : dispose
 @enduml
