@@ -14,7 +14,7 @@ SyncThread <-- Hardware : Response
 deactivate Hardware
 SyncThread -> Data : Set IO
 deactivate SyncThread
-client <-- SyncThread : Wait 
+client <-- SyncThread : Create completed 
 
 loop
 	SyncThread -> Hardware : Read IO
