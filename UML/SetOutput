@@ -1,0 +1,24 @@
+@startuml
+
+start
+: Set Output;
+if (Output == OutputHold) then (yes)
+    : Nothing to do;
+
+else (no)
+    if (OutputHold != LastWrittenOutput) then  (yes)
+        : Force Write Output;
+        note left
+          Syncronisation is required.
+          ----
+          Otherwise a change and change back
+          will not be written to the output.
+        end note
+    else (no)
+        : Set OutputHOld;
+    endif
+endif
+
+stop
+
+@enduml
