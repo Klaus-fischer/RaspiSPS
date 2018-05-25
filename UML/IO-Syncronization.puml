@@ -30,7 +30,7 @@ loop
 		SyncThread -> Hardware : Set Output Data
 	else
 		note right of SyncThread
-			Nothing to do
+			Nothing to do.
 		end note
 	end
     
