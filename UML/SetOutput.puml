@@ -12,7 +12,8 @@ else (no)
           Syncronisation is required.
           ----
           Otherwise a change and change back
-          will not be written to the output.
+          within a single loop will not be 
+          written to the output.
         end note
     else (no)
         : Set OutputHOld;
