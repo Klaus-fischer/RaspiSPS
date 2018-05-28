@@ -1,0 +1,36 @@
+@startuml
+
+actor user_code
+participant sps_code
+database kernel
+database hardware
+
+user_code -> sps_code : Initialize Interrupt pin
+activate sps_code
+sps_code -> hardware : configure interrupt pin
+sps_code -> kernel : configure interrupt gpio
+user_code <-- sps_code
+deactivate sps_code
+====
+user_code -> sps_code : WaitForIRQ
+activate sps_code
+
+loop
+    critical
+        hardware -> kernel : Interrupt happens
+        kernel -> sps_code : InterruptHandler()
+        activate sps_code
+        sps_code -> hardware : Read all input register
+        sps_code -> sps_code : Trigger all waiting threads
+    end
+
+    deactivate sps_code
+
+    alt Input not as expected
+        sps_code -> sps_code : continue loop
+    end
+end
+user_code <-- sps_code : return
+deactivate sps_code
+
+@enduml
