@@ -1,0 +1,64 @@
+@startuml
+
+actor client_code
+participant sps_code
+database hardware
+
+client_code -> sps_code : setup
+sps_code -> sps_code : set cycle time
+sps_code -> sps_code : start syncronization thread
+activate sps_code
+client_code <-- sps_code
+
+client_code -> sps_code : register routine
+activate sps_code
+
+'sps_code -> sps_code : increment barrier counter
+
+client_code <-- sps_code
+deactivate sps_code
+
+loop
+
+    sps_code -> sps_code : syncronize
+    activate sps_code
+
+    sps_code -> hardware : read inputs
+    sps_code <-- hardware
+    sps_code -> hardware : write outputs
+    deactivate sps_code
+
+    sps_code -> sps_code : run registered routines
+
+    activate sps_code
+
+    par all registered routines
+
+        sps_code -> client_code : run routine
+        activate client_code
+        note left of client_code
+        analise inputs
+        set outputs, 
+        ----
+        if (DI1 && DI2) 
+            then DO2 = 1;
+        end note
+        client_code --> sps_code
+        deactivate client_code
+
+	end
+
+
+    sps_code -> sps_code : wait on all threads
+    deactivate sps_code
+
+    sps_code -> sps_code : delay for cycle time completed
+end
+
+client_code -> sps_code : terminate
+sps_code -> sps_code : stop syncronization thread
+deactivate sps_code
+
+client_code <-- sps_code
+
+@enduml
